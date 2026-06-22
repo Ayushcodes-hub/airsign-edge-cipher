@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirSign // Secure Edge-AI Scripting Station</title>
+    
+    <!-- MediaPipe Edge Graphics Infrastructure Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --bg-color: #0b0a07;
+            --panel-bg: #14120e;
+            --gold-primary: #d4af37;
+            --gold-glow: #f3e5ab;
+            --text-color: #f4f1ea;
+            --border-color: #3a321a;
+            --alert-color: #cf3c3c;
+            --safe-color: #5da470;
+        }
+
+        body {
+            margin: 0; padding: 20px;
+            background-color: var(--bg-color); color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 {
+            color: var(--gold-primary); text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            margin: 0; font-size: 2.2rem; letter-spacing: 3px; font-weight: 800;
+        }
+        header p { color: #8c826e; margin-top: 5px; font-size: 0.9rem; letter-spacing: 1px; }
+
+        .container { display: flex; gap: 25px; max-width: 1200px; width: 100%; }
+        .workspace-left, .workspace-right {
+            flex: 1; background: var(--panel-bg); border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 12px;
+            padding: 25px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .video-container {
+            position: relative; width: 100%; max-width: 500px; aspect-ratio: 4/3;
+            background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);
+        }
+        #webcam { display: none; }
+        #output-canvas { width: 100%; height: 100%; }
+
+        .text-panel { width: 100%; margin-top: 20px; }
+        textarea {
+            width: 100%; height: 110px; background: #1c1912; border: 1px solid var(--border-color);
+            color: var(--gold-glow); padding: 12px; box-sizing: border-box; border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; font-weight: bold; resize: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2a2210 0%, #1c160a 100%); color: var(--gold-primary);
+            border: 1px solid var(--gold-primary); padding: 12px 20px; font-size: 0.9rem;
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s ease; width: 100%;
+        }
+        button:hover { background: var(--gold-primary); color: var(--bg-color); box-shadow: 0 0 20px rgba(214, 175, 55, 0.6); }
+
+        .file-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .file-input-wrapper { position: relative; width: 100%; }
+        .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .status-tag { font-size: 0.75rem; color: #a49679; font-weight: bold; letter-spacing: 1.5px; align-self: flex-start; margin-bottom: 8px; }
+        .crypto-key-panel { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+        .crypto-key-panel input { background: #1c1912; border: 1px solid var(--border-color); color: var(--gold-primary); padding: 8px; border-radius: 4px; font-family: monospace; font-weight: bold; }
+        #stego-canvas { max-width: 100%; border-radius: 6px; border: 1px dashed var(--border-color); background: #1c1912; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AIRSIGN // EDGE-AI CIPHER</h1>
+        <p>On-Device Motion Tracking & Local Language Inference Station</p>
+    </header>
+
+    <div class="container">
+        <!-- LEFT WORKSPACE: LOCAL AI LOGIC -->
+        <div class="workspace-left">
+            <span class="status-tag" id="model-status">// INITIALIZING ON-DEVICE TRANSFORMER MODEL...</span>
+            <div class="video-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="output-canvas" width="640" height="480"></canvas>
+            </div>
+            
+            <button id="toggle-cam-btn" style="border-color: var(--alert-color); color: var(--alert-color); margin-top: 15px;">TERMINATE CAMERA FEED (GO OFFLINE)</button>
+
+            <div class="text-panel">
+                <span class="status-tag">// LIVE RECONSTRUCTED OUTPUT LAYER</span>
+                <textarea id="output-text" placeholder="Engage hand over keys. Pinch empty banner suggestion area to autocomplete..."></textarea>
+                <button id="clear-btn" style="border-color: var(--alert-color); color: var(--alert-color); margin-top: 10px;">PURGE CLEAR STRING BUFFER</button>
+            </div>
+        </div>
+
+        <!-- RIGHT WORKSPACE: HARDWARE-ISOLATED CRYPTO HUB -->
+        <div class="workspace-right">
+            <span class="status-tag">// POLYALPHABETIC STEGO ENGINE</span>
+            <div style="width:100%; display:flex; flex-direction:column; gap:12px;">
+                <div class="crypto-key-panel">
+                    <span class="status-tag">[CIPHER KEY MATRIX]</span>
+                    <input type="text" id="cipher-key" value="OSDHACKLOCAL2026">
+                </div>
+
+                <button id="hide-btn">ENCRYPT & INJECT INTO IMAGE</button>
+                <canvas id="stego-canvas" width="400" height="300"></canvas>
+                
+                <div class="file-controls">
+                    <button id="download-btn" style="border-color: var(--safe-color); color: var(--safe-color);">DOWNLOAD PNG</button>
+                    <div class="file-input-wrapper">
+                        <button type="button" style="border-color: #8faec4; color:#8faec4;">UPLOAD FILE</button>
+                        <input type="file" id="upload-file" accept="image/png">
+                    </div>
+                </div>
+                <button id="extract-btn" style="border-color: #e5c158; color: #e5c158;">REVERSE CIPHER & DESTRUCT DECODE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Module Handlers -->
+    <script type="module" src="../src/main.js"></script>
+</body>
+</html>
